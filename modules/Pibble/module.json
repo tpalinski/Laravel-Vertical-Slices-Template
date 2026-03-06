@@ -1,0 +1,10 @@
+{
+    "name": "Pibble",
+    "version": "1.0.0",
+    "enabled": true,
+    "environment": "local",
+    "dependencies": [],
+    "features": [],
+    "resourceProvider": "Modules\\Pibble\\PibbleResourceProvider",
+    "serviceProvider": "Modules\\Pibble\\Architecture\\Providers\\PibbleServiceProvider"
+}

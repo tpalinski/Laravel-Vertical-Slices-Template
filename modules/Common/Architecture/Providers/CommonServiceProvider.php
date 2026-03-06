@@ -6,7 +6,7 @@ namespace Modules\Common\Architecture\Providers;
 
 use Core\Providers\ModuleServiceProvider;
 
-class CommonResourceProvider extends ModuleServiceProvider
+class CommonServiceProvider extends ModuleServiceProvider
 {
     public function provides(): array {
         return [];

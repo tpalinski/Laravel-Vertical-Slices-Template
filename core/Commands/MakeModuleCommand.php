@@ -105,7 +105,7 @@ namespace Modules\\{$name}\\Architecture\Providers;
 
 use Core\Providers\ModuleServiceProvider;
 
-class {$name}ResourceProvider extends ModuleServiceProvider
+class {$name}ServiceProvider extends ModuleServiceProvider
 {
     public function provides(): array {
         return [];
