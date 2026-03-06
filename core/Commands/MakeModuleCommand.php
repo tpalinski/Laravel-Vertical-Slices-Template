@@ -42,22 +42,23 @@ class MakeModuleCommand extends Command
             }
         }
 
+        $this->generateResourceProvider($base, $name, $lower);
         $this->generateServiceProvider($base, $name, $lower);
         $this->generateConfig($base, $lower);
         $this->generateApiRoutes($base, $name, $lower);
+        $this->generateManifest($base, $name);
 
         $this->newLine();
         $this->info("Module [{$name}] scaffolded successfully.");
-        $this->line("  Next: add <fg=yellow>Modules\\{$name}\\{$name}ModuleProvider::class</> to <fg=yellow>CoreServiceProvider::\$modules</>.");
 
         return self::SUCCESS;
     }
 
     // -------------------------------------------------------------------------
 
-    private function generateServiceProvider(string $base, string $name, string $lower): void
+    private function generateResourceProvider(string $base, string $name, string $lower): void
     {
-        $path = "{$base}/{$name}ModuleProvider.php";
+        $path = "{$base}/{$name}ResourceProvider.php";
 
         if (file_exists($path)) {
             return;
@@ -70,18 +71,48 @@ declare(strict_types=1);
 
 namespace Modules\\{$name};
 
-use Core\Providers\ModuleServiceProvider;
+use Core\Providers\ModuleResourceProvider;
 
-class {$name}ModuleProvider extends ModuleServiceProvider
+class {$name}ResourceProvider extends ModuleResourceProvider
 {
-    protected function modulePath(): string
-    {
-        return dirname(__DIR__);
+    protected function modulePath(): string {
+        return base_path('modules/{$name}');
     }
 
-    protected function routePrefix(): string
-    {
+    protected function routePrefix(): string {
         return '{$lower}';
+    }
+}
+PHP;
+        file_put_contents($path, $stub);
+        $this->line("  <info>generated</info> {$path}");
+    }
+
+    private function generateServiceProvider(string $base, string $name, string $lower): void
+    {
+        $path = "{$base}/Architecture/Providers/{$name}ServiceProvider.php";
+
+        if (file_exists($path)) {
+            return;
+        }
+
+        $stub = <<<PHP
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\\{$name}\\Architecture\Providers;
+
+use Core\Providers\ModuleServiceProvider;
+
+class {$name}ResourceProvider extends ModuleServiceProvider
+{
+    public function provides(): array {
+        return [];
+    }
+
+    protected function registerBindings(): void {
+
     }
 }
 PHP;
@@ -127,5 +158,34 @@ Route::prefix('api/v1/{$lower}')->name('{$lower}.')->group(function () {
 PHP;
         file_put_contents($path, $stub);
         $this->line("  <info>generated</info> {$path}");
+    }
+
+    private function generateManifest(string $base, string $name) {
+        $manifestPath = rtrim($base, '/').'/module.json';
+
+        if (file_exists($manifestPath)) {
+            return;
+        }
+
+        $manifest = [
+            "name" => $name,
+            "version" => "1.0.0",
+            "enabled" => true,
+            "environment" => "local",
+            "dependencies" => [],
+            "features" => [],
+            "resourceProvider" => "Modules\\{$name}\\{$name}ResourceProvider",
+            "serviceProvider" => "Modules\\{$name}\\Architecture\Providers\\{$name}ServiceProvider",
+        ];
+
+        file_put_contents(
+            $manifestPath,
+            json_encode(
+                $manifest,
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            )
+        );
+
+        $this->info("Manifest generated: {$manifestPath}");
     }
 }

@@ -1,0 +1,10 @@
+{
+    "name": "Common",
+    "version": "1.0.0",
+    "enabled": true,
+    "environment": "local",
+    "dependencies": [],
+    "features": [],
+    "resourceProvider": "Modules\\Common\\CommonResourceProvider",
+    "serviceProvider": "Modules\\Common\\Architecture\\Providers\\CommonServiceProvider"
+}

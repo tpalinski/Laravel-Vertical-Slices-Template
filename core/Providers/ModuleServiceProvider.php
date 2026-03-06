@@ -7,67 +7,34 @@ namespace Core\Providers;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
-/**
- * ModuleServiceProvider — base class for every Module's provider.
- *
- * Each module extends this and overrides the hook methods it needs.
- * This keeps individual module providers clean and focused.
- *
- * Module providers are responsible for:
- *   - Registering module routes
- *   - Publishing / merging module config
- *   - Loading module migrations and views
- *   - Registering module-specific bindings / singletons
- */
 abstract class ModuleServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
-     * Override in the module to return the module's root path.
-     * Typically: dirname(__DIR__)
+     * Services provided by this provider (required for deferred loading).
+     *
+     * @return array<class-string>
      */
-    abstract protected function modulePath(): string;
+    public function provides(): array {
+        return [];
+    }
 
     /**
-     * Override to return the module's route namespace prefix (e.g. 'auth').
+     * Register domain bindings.
      */
-    abstract protected function routePrefix(): string;
-
     public function register(): void
     {
-        $this->mergeModuleConfig();
+        $this->registerBindings();
     }
 
-    public function boot(): void
-    {
-        $this->loadModuleRoutes();
-        $this->loadModuleMigrations();
+    /**
+     * Boot domain logic (if needed).
+     */
+    public function boot(): void {
     }
 
-    // -------------------------------------------------------------------------
-    // Protected helpers — override as needed in the concrete module provider
-    // -------------------------------------------------------------------------
-
-    protected function mergeModuleConfig(): void {
-        $configPath = $this->modulePath() . '/config/' . $this->routePrefix() . '.php';
-
-        if (file_exists($configPath)) {
-            $this->mergeConfigFrom($configPath, $this->routePrefix());
-        }
-    }
-
-    protected function loadModuleRoutes(): void {
-        $routesPath = $this->modulePath() . 'Rest/routes';
-
-        if (file_exists($routesPath . '/api.php')) {
-            $this->loadRoutesFrom($routesPath . '/api.php');
-        }
-    }
-
-    protected function loadModuleMigrations(): void {
-        $migrationsPath = $this->modulePath() . '/persistence/migrations';
-
-        if (is_dir($migrationsPath)) {
-            $this->loadMigrationsFrom($migrationsPath);
-        }
+    /**
+     * Override in modules to bind domain services.
+     */
+    protected function registerBindings(): void {
     }
 }

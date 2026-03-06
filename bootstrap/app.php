@@ -1,6 +1,10 @@
 <?php
 
+use Core\Commands\MakeModuleCommand;
+use Core\Commands\MakeModuleMigrationCommand;
+use Core\Commands\MakeModuleModelCommand;
 use Core\Middleware\ForceJsonResponse;
+use Core\Providers\ModuleManagerServiceProvider;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -11,8 +15,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        api: __DIR__.'/../core/routes/api.php',
-        commands: __DIR__.'/../core/routes/console.php',
+        api: base_path('/core/routes/api.php'),
+        commands: base_path('/core/routes/console.php'),
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -25,7 +29,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
     })
+    ->withCommands([
+        MakeModuleCommand::class,
+        MakeModuleModelCommand::class,
+        MakeModuleMigrationCommand::class,
+    ])
+    ->withProviders([
+        ModuleManagerServiceProvider::class,
+    ])
     ->create();
 
