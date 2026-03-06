@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace Core;
 
 use Core\Enum\Environment;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
 class ModuleManager {
 
     const string MANIFEST_CACHE_KEY = 'modules.manifests';
     const string BOOT_ORDER_CACHE_KEY = 'modules.boot.order';
+
+    public function __construct(
+        private readonly CacheRepository $cache,
+    ) {}
 
     public function registerModules(): void {
         $modules = $this->cachedModules();
@@ -24,7 +29,7 @@ class ModuleManager {
     }
 
     protected function cachedModules(): array {
-        return cache()->remember(
+        return $this->cache->remember(
             ModuleManager::MANIFEST_CACHE_KEY . config('app.env'),
             3600,
             fn () => $this->discoverModules()
@@ -32,7 +37,7 @@ class ModuleManager {
     }
 
     protected function cachedBootOrder(): array {
-        return cache()->remember(
+        return $this->cache->remember(
             ModuleManager::BOOT_ORDER_CACHE_KEY . config('app.env'),
             3600,
             fn () => $this->sortModulesByDependencies(
