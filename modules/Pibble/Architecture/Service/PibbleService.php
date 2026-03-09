@@ -15,7 +15,8 @@ class PibbleService implements PibbleServiceInterface {
 
     public function getPibble(string $name): Pibble
     {
-        throw new \Exception('Not implemented');
+        $res = Pibble::where('name', $name)->first();
+        return $res;
     }
 
     public function createPibble(string $name): void
