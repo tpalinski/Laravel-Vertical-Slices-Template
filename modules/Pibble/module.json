@@ -3,8 +3,8 @@
     "version": "1.0.0",
     "enabled": true,
     "environment": "local",
-    "dependencies": [],
-    "features": [],
+    "dependencies": ["Common"],
+    "features": ["bellywash"],
     "resourceProvider": "Modules\\Pibble\\PibbleResourceProvider",
     "serviceProvider": "Modules\\Pibble\\Architecture\\Providers\\PibbleServiceProvider"
 }

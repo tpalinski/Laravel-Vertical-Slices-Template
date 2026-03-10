@@ -18,7 +18,7 @@ class MakeModuleModelCommand extends Command
         $module = $this->argument('module');
         $name   = $this->argument('name');
 
-        $modelPath = base_path("modules/{$module}/Persistence/Model");
+        $modelPath = base_path("modules/{$module}/Domain/Model");
 
         if (! is_dir($modelPath)) {
             mkdir($modelPath, 0755, true);
@@ -33,7 +33,7 @@ class MakeModuleModelCommand extends Command
             return Command::FAILURE;
         }
 
-        $namespace = "Modules\\{$module}\\Persistence\Model";
+        $namespace = "Modules\\{$module}\\Domain\Model";
 
         $content = <<<PHP
 <?php

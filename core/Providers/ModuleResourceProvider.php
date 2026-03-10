@@ -61,7 +61,7 @@ abstract class ModuleResourceProvider extends ServiceProvider
 
     protected function loadModuleRoutes(): void {
         $routesPath = rtrim($this->modulePath(), '/')
-            . '/Rest/routes/api.php';
+            . '/routes/api.php';
 
         if (is_file($routesPath)) {
             $this->loadRoutesFrom($routesPath);

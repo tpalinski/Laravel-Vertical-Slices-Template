@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Pibble\Persistence\Model;
+namespace Modules\Pibble\Domain\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,8 +11,5 @@ class Pibble extends Model
 
     protected $table = strtolower('Pibbles');
 
-    protected $fillable = [
-        "name",
-        "bellyWashed"
-    ];
+    protected $fillable = ['name', 'belly_washed'];
 }

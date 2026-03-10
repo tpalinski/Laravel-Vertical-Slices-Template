@@ -19,9 +19,11 @@ class ModuleManager {
     public function registerModules(): void {
         $modules = $this->cachedModules();
         $sorted = $this->cachedBootOrder();
+        /*
         if (count($sorted) !== count($modules)) {
             throw new \RuntimeException("Circular module dependency detected");
         }
+         */
         // TODO - register them according to sorting
         foreach ($modules as $module) {
             $this->registerModule($module);

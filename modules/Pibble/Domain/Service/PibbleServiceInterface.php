@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Pibble\Domain\Service;
 
-use Modules\Pibble\Persistence\Model\Pibble;
+use Modules\Pibble\Domain\Model\Pibble;
 
 interface PibbleServiceInterface {
     public function greetPibble(): string;

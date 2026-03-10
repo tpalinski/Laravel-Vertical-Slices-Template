@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pibble', function (Blueprint $table) {
+        Schema::create('pibbles', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('name', 255);
-            $table->boolean('bellyWashed')->default(false);
+            $table->string('name', 255)->unique();
+            $table->boolean('belly_washed')->default(false);
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pibble');
+        Schema::dropIfExists('pibbles');
     }
 };

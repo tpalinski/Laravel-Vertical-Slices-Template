@@ -30,7 +30,7 @@ class MakeModuleCommand extends Command
         $base   = base_path("modules/{$name}");
 
         $directories = [
-            'Rest/Controller', 'Rest/routes', 'Rest/Middleware','Architecture/Service', 'Architecture/Job', 'Architecture/Providers', 'Domain/Service', 'Domain/DTO', 'Domain/Exception', 'Persistence/migrations', 'Persistence/Model', 'Persistence/Factory', 'Persistence/Seeder', 'config',
+            'Architecture/Controller', 'routes', 'Architecture/Middleware','Architecture/Service', 'Architecture/Job', 'Architecture/Providers', 'Architecture/Repository','Domain/Service', 'Domain/DTO', 'Domain/Exception', 'Domain/Model', 'Persistence/migrations', 'Persistence/Factory', 'Persistence/Seeder', 'config',
             'Test/Unit', 'Test/Feature',
         ];
 
@@ -141,7 +141,7 @@ PHP;
 
     private function generateApiRoutes(string $base, string $name, string $lower): void
     {
-        $path = "{$base}/Rest/routes/api.php";
+        $path = "{$base}/routes/api.php";
 
         if (file_exists($path)) {
             return;
