@@ -6,6 +6,6 @@ namespace Modules\Pibble\Domain\DTO;
 
 use Spatie\LaravelData\Data;
 
-class PibbleRequestDto extends Data {
-    public string $name;
+class BellyWashResponseDto extends Data {
+    public bool $cleanedRealGood;
 }

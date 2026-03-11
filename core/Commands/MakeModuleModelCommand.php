@@ -34,6 +34,7 @@ class MakeModuleModelCommand extends Command
         }
 
         $namespace = "Modules\\{$module}\\Domain\Model";
+        $table = strtolower($name.'s');
 
         $content = <<<PHP
 <?php
@@ -47,7 +48,7 @@ class {$className} extends Model
 {
     use HasFactory;
 
-    protected \$table = strtolower('{$name}s');
+    protected \$table = {$table};
 
     protected \$fillable = [];
 }

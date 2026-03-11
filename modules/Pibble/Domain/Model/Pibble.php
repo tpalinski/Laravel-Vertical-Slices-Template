@@ -9,7 +9,7 @@ class Pibble extends Model
 {
     use HasFactory;
 
-    protected $table = strtolower('Pibbles');
+    protected $table = 'pibbles';
 
     protected $fillable = ['name', 'belly_washed'];
 }

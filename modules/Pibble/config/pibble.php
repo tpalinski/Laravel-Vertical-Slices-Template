@@ -1,5 +1,5 @@
 <?php
 
 return [
-    // pibble module configuration
+    "message" => "Hi, it's me, Pibble. Wash my belly",
 ];

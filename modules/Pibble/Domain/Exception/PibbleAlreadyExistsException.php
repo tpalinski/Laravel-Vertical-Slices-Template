@@ -6,4 +6,4 @@ namespace Modules\Pibble\Domain\Exception;
 
 use Core\Exception\DomainException;
 
-class PibbleNotFoundException extends DomainException {}
+class PibbleAlreadyExistsException extends DomainException {}

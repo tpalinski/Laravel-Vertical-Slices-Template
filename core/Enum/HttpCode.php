@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Core\Exception;
+namespace Core\Enum;
 
-enum HttpExceptionCode: int
+enum HttpCode: int
 {
+    public function code(): int {
+        return $this->value;
+    }
+
     // 1xx Informational
     case CONTINUE = 100;
     case SWITCHING_PROTOCOLS = 101;

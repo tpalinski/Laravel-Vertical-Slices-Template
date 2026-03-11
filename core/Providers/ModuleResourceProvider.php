@@ -71,10 +71,8 @@ abstract class ModuleResourceProvider extends ServiceProvider
     protected function loadModuleMigrations(): void {
         $migrationsPath = rtrim($this->modulePath(), '/')
             . '/Persistence/migrations';
-        echo($migrationsPath);
 
         if (is_dir($migrationsPath)) {
-            echo($migrationsPath);
             $this->loadMigrationsFrom($migrationsPath);
         }
     }
