@@ -48,7 +48,7 @@ class {$className} extends Model
 {
     use HasFactory;
 
-    protected \$table = {$table};
+    protected \$table = '{$table}';
 
     protected \$fillable = [];
 }
@@ -58,6 +58,7 @@ PHP;
 
         $this->info("Model created: {$filePath}");
         $this->createFactory($module, $name);
+        $this->createRepository($module, $name);
 
         return Command::SUCCESS;
     }
@@ -78,7 +79,7 @@ PHP;
             return;
         }
 
-        $modelNamespace = "Modules\\{$module}\\Persistence\Model\\{$name}";
+        $modelNamespace = "Modules\\{$module}\\Domain\Model\\{$name}";
         $factoryNamespace = "Modules\\{$module}\\Persistence\\Factory";
 
         $content = <<<PHP
@@ -105,5 +106,45 @@ PHP;
         file_put_contents($filePath, $content);
 
         $this->info("Factory created: {$filePath}");
+    }
+
+    protected function createRepository(string $module, string $name) {
+        $repositoryPath = base_path("modules/{$module}/Architecture/Repository");
+
+        if (! is_dir($repositoryPath)) {
+            mkdir($repositoryPath, 0755, true);
+        }
+
+        $className = $name . 'Repository';
+
+        $filePath = "{$repositoryPath}/{$className}.php";
+
+        if (file_exists($filePath)) {
+            $this->error("Repository already exists.");
+            return;
+        }
+
+        $modelNamespace = "Modules\\{$module}\\Domain\Model\\{$name}";
+        $repositoryNamespace = "Modules\\{$module}\\Architecture\Repository";
+
+        $content = <<<PHP
+<?php
+
+namespace {$repositoryNamespace};
+
+use Core\Repository\Repository;
+
+class {$className} extends Repository
+{
+    public function model(): string
+    {
+        return \\{$modelNamespace}::class;
+    }
+}
+PHP;
+
+        file_put_contents($filePath, $content);
+
+        $this->info("Repository created: {$filePath}");
     }
 }
