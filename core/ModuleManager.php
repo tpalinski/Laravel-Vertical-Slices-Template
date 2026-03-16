@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Core;
 
 use Core\Enum\Environment;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class ModuleManager {
 
-    const string MANIFEST_CACHE_KEY = 'modules.manifests';
-    const string BOOT_ORDER_CACHE_KEY = 'modules.boot.order';
+    const string MANIFEST_CACHE_KEY = 'manifests';
+    const string BOOT_ORDER_CACHE_KEY = 'boot.order';
 
     public function __construct(
-        private readonly CacheRepository $cache,
+        private readonly CacheInterface $cache,
     ) {}
 
     public function registerModules(): void {
@@ -31,17 +31,15 @@ class ModuleManager {
     }
 
     protected function cachedModules(): array {
-        return $this->cache->remember(
+        return $this->cache->get(
             ModuleManager::MANIFEST_CACHE_KEY . config('app.env'),
-            3600,
             fn () => $this->discoverModules()
         );
     }
 
     protected function cachedBootOrder(): array {
-        return $this->cache->remember(
+        return $this->cache->get(
             ModuleManager::BOOT_ORDER_CACHE_KEY . config('app.env'),
-            3600,
             fn () => $this->sortModulesByDependencies(
                 $this->cachedModules()
             )

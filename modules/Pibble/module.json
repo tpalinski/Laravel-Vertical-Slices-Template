@@ -4,7 +4,7 @@
     "enabled": true,
     "environment": "local",
     "dependencies": ["Common"],
-    "features": ["bellywash"],
+    "featureFlags": ["bellywash"],
     "roles": [],
     "resourceProvider": "Modules\\Pibble\\PibbleResourceProvider",
     "serviceProvider": "Modules\\Pibble\\Architecture\\Providers\\PibbleServiceProvider"

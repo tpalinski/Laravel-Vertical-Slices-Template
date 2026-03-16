@@ -4,14 +4,24 @@ declare(strict_types=1);
 
 namespace Core\Providers;
 
+use Core\Cache\CoreCache;
 use Core\ServiceProxy\ServiceProxy;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use ReflectionClass;
 use ReflectionUnionType;
+use Symfony\Contracts\Cache\CacheInterface;
 
 abstract class ModuleServiceProvider extends ServiceProvider implements DeferrableProvider
 {
+
+    private readonly CacheInterface $cache;
+
+    public function __construct($app)
+    {
+        $this->cache = new CoreCache();
+        return parent::__construct($app);
+    }
 
     /**
      * Services bound by this provider
@@ -63,38 +73,53 @@ abstract class ModuleServiceProvider extends ServiceProvider implements Deferrab
         $this->app->bind($interface, function ($app) use ($concrete, $flags, $interface) {
             $service = $app->make($concrete);
             $proxy = new ServiceProxy($flags, $service);
-            $interfaceProxy = $this->generateProxy($interface);
-            return new $interfaceProxy($proxy);
+            $interfaceProxy = $this->getProxy($interface, $proxy);
+            return $interfaceProxy;
         });
     }
 
     protected function cacheKey(): string {
-        return 'framework.modules.' . $this->modulePath();
+        return 'modules.' . $this->modulePath();
     }
 
     /**
      * Load module manifest (module.json)
      */
     protected function manifest(): array {
-        $manifestPath = rtrim($this->modulePath(), '/')
-            . '/module.json';
+        return $this->cache->get(
+            $this->cacheKey() . '.manifest',
+            function () {
+                $manifestPath = rtrim($this->modulePath(), '/')
+                    . '/module.json';
 
-        if (!is_file($manifestPath)) {
-            return [];
-        }
+                if (!is_file($manifestPath)) {
+                    return [];
+                }
 
-        return json_decode(
-            file_get_contents($manifestPath),
-            true
-        ) ?? [];
+                return json_decode(
+                    file_get_contents($manifestPath),
+                    true
+                ) ?? [];
+            }
+        );
     }
 
     protected function getFeatureFlags(): array {
         $manifest = $this->manifest();
-        return $manifest['features'];
+        return $manifest['featureFlags'];
     }
 
-    protected function generateProxy(string $interface): string {
+    protected function getProxy(string $interface, object $service): object {
+        $cacheKey = $this->cacheKey() . '.proxy.' . $interface;
+        return $this->cache->get(
+            $cacheKey,
+            function () use ($interface, $service) {
+                return $this->generateProxy($interface, $service);
+            }
+        );
+    }
+
+    protected function generateProxy(string $interface, object $service): object {
         $reflection = new ReflectionClass($interface);
         $methods = '';
 
@@ -196,6 +221,6 @@ abstract class ModuleServiceProvider extends ServiceProvider implements Deferrab
 
         eval($code);
 
-        return $class;
+        return new $class($service);
     }
 }
