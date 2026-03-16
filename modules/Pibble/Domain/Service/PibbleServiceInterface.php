@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Pibble\Domain\Service;
 
+use Core\Annotations\Feature;
 use Modules\Pibble\Domain\Exception\PibbleAlreadyExistsException;
 use Modules\Pibble\Domain\Exception\PibbleNotFoundException;
 use Modules\Pibble\Domain\Model\Pibble;
@@ -21,5 +22,6 @@ interface PibbleServiceInterface {
     /**
      * @throws PibbleNotFoundException
      */
+    #[Feature('bellywash')]
     public function washBelly(string $name): bool;
 }

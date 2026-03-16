@@ -10,13 +10,11 @@ use Modules\Pibble\Domain\Service\PibbleServiceInterface;
 
 class PibbleServiceProvider extends ModuleServiceProvider
 {
-    public function provides(): array {
-        return [
-            PibbleServiceInterface::class,
-        ];
+    protected function modulePath(): string {
+        return base_path('modules/Pibble');
     }
 
-    protected function registerBindings(): void {
-        $this->app->bind(PibbleServiceInterface::class, PibbleService::class);
-    }
+    public array $moduleBindings = [
+        PibbleServiceInterface::class => PibbleService::class,
+    ];
 }

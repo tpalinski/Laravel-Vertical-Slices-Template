@@ -8,11 +8,9 @@ use Core\Providers\ModuleServiceProvider;
 
 class CommonServiceProvider extends ModuleServiceProvider
 {
-    public function provides(): array {
-        return [];
+    protected function modulePath(): string {
+        return base_path('modules/Common');
     }
 
-    protected function registerBindings(): void {
-
-    }
+    public array $moduleBindings = [];
 }

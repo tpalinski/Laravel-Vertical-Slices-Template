@@ -31,20 +31,6 @@ abstract class ModuleResourceProvider extends ServiceProvider
 
     // ------------------------------------------------------------
 
-    protected function loadManifest(): void {
-        $manifestPath = rtrim($this->modulePath(), '/')
-            . '/module.json';
-
-        if (!is_file($manifestPath)) {
-            return;
-        }
-
-        $this->manifest = json_decode(
-            file_get_contents($manifestPath),
-            true
-        ) ?? [];
-    }
-
     protected function mergeModuleConfig(): void {
         $configPath = rtrim($this->modulePath(), '/')
             . '/config/'
@@ -77,10 +63,4 @@ abstract class ModuleResourceProvider extends ServiceProvider
         }
     }
 
-    protected function getConfig(): array {
-        if (!$this->manifest) {
-            $this->loadManifest();
-        }
-        return $this->manifest;
-    }
 }
