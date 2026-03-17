@@ -38,7 +38,7 @@ class CoreProxyGenerator
                 $this->generateFile($reflection, $className, $file);
             }
 
-            require_once $file;
+            class_exists($file);
         }
 
         return new $fqcn($service);
@@ -76,7 +76,6 @@ $methods
 
         file_put_contents($file, $code);
 
-        // Optional: warm OPcache if available
         if (function_exists('opcache_compile_file')) {
             @opcache_compile_file($file);
         }
