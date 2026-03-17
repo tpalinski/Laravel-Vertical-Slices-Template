@@ -17,7 +17,7 @@ class CoreProxyGenerator
 
     public function __construct(?string $basePath = null)
     {
-        $this->basePath = $basePath ?? dirname(__DIR__, 2) . '/Core/Proxies';
+        $this->basePath = $basePath ?? dirname(__DIR__, 2) . '/core/Proxies';
     }
 
     public function generateProxy(string $interface, object $service): object
