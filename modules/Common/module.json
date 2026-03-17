@@ -4,7 +4,7 @@
     "enabled": true,
     "environment": "local",
     "dependencies": [],
-    "features": [],
+    "featureFlags": [],
     "resourceProvider": "Modules\\Common\\CommonResourceProvider",
     "serviceProvider": "Modules\\Common\\Architecture\\Providers\\CommonServiceProvider"
 }
