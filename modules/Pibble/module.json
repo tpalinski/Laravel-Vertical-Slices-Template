@@ -5,7 +5,5 @@
     "environment": "local",
     "dependencies": ["Common"],
     "featureFlags": ["bellywash"],
-    "roles": [],
-    "resourceProvider": "Modules\\Pibble\\PibbleResourceProvider",
-    "serviceProvider": "Modules\\Pibble\\Architecture\\Providers\\PibbleServiceProvider"
+    "roles": []
 }

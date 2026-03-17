@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Pibble\Domain\Model;
+namespace Modules\Pibble\Persistence\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

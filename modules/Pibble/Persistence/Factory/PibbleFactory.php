@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PibbleFactory extends Factory
 {
-    protected $model = \Modules\Pibble\Domain\Model\Pibble::class;
+    protected $model = \Modules\Pibble\Persistence\Model\Pibble::class;
 
     public function definition(): array
     {

@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Modules\Pibble\Architecture\Service;
+namespace Modules\Pibble\Domain\Service;
 
 use Illuminate\Database\QueryException;
-use Modules\Pibble\Architecture\Repository\PibbleRepository;
 use Modules\Pibble\Domain\Exception\PibbleAlreadyExistsException;
 use Modules\Pibble\Domain\Exception\PibbleNotFoundException;
-use Modules\Pibble\Domain\Model\Pibble;
-use Modules\Pibble\Domain\Service\PibbleServiceInterface;
+use Modules\Pibble\Domain\Repository\PibbleRepository;
+use Modules\Pibble\Persistence\Model\Pibble;
 
 class PibbleService implements PibbleServiceInterface {
 

@@ -5,6 +5,5 @@
     "environment": "local",
     "dependencies": [],
     "featureFlags": [],
-    "resourceProvider": "Modules\\Common\\CommonResourceProvider",
-    "serviceProvider": "Modules\\Common\\Architecture\\Providers\\CommonServiceProvider"
+    "roles": []
 }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Modules\Pibble\Architecture\Repository;
+namespace Modules\Pibble\Domain\Repository;
 
 use Core\Repository\Repository;
-use Modules\Pibble\Domain\Model\Pibble;
+use Modules\Pibble\Persistence\Model\Pibble;
 
 class PibbleRepository extends Repository {
 

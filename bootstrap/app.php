@@ -1,5 +1,6 @@
 <?php
 
+use Core\Commands\ClearInternalCacheCommand;
 use Core\Commands\MakeModuleCommand;
 use Core\Commands\MakeModuleMigrationCommand;
 use Core\Commands\MakeModuleModelCommand;
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
         MakeModuleCommand::class,
         MakeModuleModelCommand::class,
         MakeModuleMigrationCommand::class,
+        ClearInternalCacheCommand::class,
     ])
     ->withProviders([
         ModuleManagerServiceProvider::class,

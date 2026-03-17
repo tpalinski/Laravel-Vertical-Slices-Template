@@ -77,9 +77,9 @@ class ModuleManager {
 
     protected function registerModule(array $module): void
     {
-        $config = $module['config'];
-        $resourceProvider = $config['resourceProvider'];
-        $serviceProvider = $config['serviceProvider'];
+        $moduleName = $module['config']['name'];
+        $resourceProvider = '\\Modules\\' . $moduleName . '\\'.$moduleName.'ResourceProvider';
+        $serviceProvider = '\\Modules\\' . $moduleName . '\\Architecture\\Providers\\' . $moduleName.'ServiceProvider';
 
         if (class_exists($resourceProvider)) {
             app()->register($resourceProvider);

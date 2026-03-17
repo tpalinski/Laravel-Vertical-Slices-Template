@@ -18,7 +18,7 @@ class MakeModuleModelCommand extends Command
         $module = $this->argument('module');
         $name   = $this->argument('name');
 
-        $modelPath = base_path("modules/{$module}/Domain/Model");
+        $modelPath = base_path("modules/{$module}/Persistence/Model");
 
         if (! is_dir($modelPath)) {
             mkdir($modelPath, 0755, true);
@@ -33,7 +33,7 @@ class MakeModuleModelCommand extends Command
             return Command::FAILURE;
         }
 
-        $namespace = "Modules\\{$module}\\Domain\Model";
+        $namespace = "Modules\\{$module}\\Persistence\Model";
         $table = strtolower($name.'s');
 
         $content = <<<PHP
@@ -79,7 +79,7 @@ PHP;
             return;
         }
 
-        $modelNamespace = "Modules\\{$module}\\Domain\Model\\{$name}";
+        $modelNamespace = "Modules\\{$module}\\Persistence\Model\\{$name}";
         $factoryNamespace = "Modules\\{$module}\\Persistence\\Factory";
 
         $content = <<<PHP
@@ -109,7 +109,7 @@ PHP;
     }
 
     protected function createRepository(string $module, string $name) {
-        $repositoryPath = base_path("modules/{$module}/Architecture/Repository");
+        $repositoryPath = base_path("modules/{$module}/Domain/Repository");
 
         if (! is_dir($repositoryPath)) {
             mkdir($repositoryPath, 0755, true);
@@ -124,8 +124,8 @@ PHP;
             return;
         }
 
-        $modelNamespace = "Modules\\{$module}\\Domain\Model\\{$name}";
-        $repositoryNamespace = "Modules\\{$module}\\Architecture\Repository";
+        $modelNamespace = "Modules\\{$module}\\Persistence\Model\\{$name}";
+        $repositoryNamespace = "Modules\\{$module}\\Domain\Repository";
 
         $content = <<<PHP
 <?php

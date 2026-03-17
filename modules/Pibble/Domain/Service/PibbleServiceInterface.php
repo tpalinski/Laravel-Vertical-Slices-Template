@@ -7,7 +7,7 @@ namespace Modules\Pibble\Domain\Service;
 use Core\Annotations\Feature;
 use Modules\Pibble\Domain\Exception\PibbleAlreadyExistsException;
 use Modules\Pibble\Domain\Exception\PibbleNotFoundException;
-use Modules\Pibble\Domain\Model\Pibble;
+use Modules\Pibble\Persistence\Model\Pibble;
 
 interface PibbleServiceInterface {
     public function greetPibble(): string;

@@ -30,7 +30,7 @@ class MakeModuleCommand extends Command
         $base   = base_path("modules/{$name}");
 
         $directories = [
-            'Architecture/Controller', 'routes', 'Architecture/Middleware','Architecture/Service', 'Architecture/Job', 'Architecture/Providers', 'Architecture/Repository','Domain/Service', 'Domain/DTO', 'Domain/Exception', 'Domain/Model', 'Persistence/migrations', 'Persistence/Factory', 'Persistence/Seeder', 'config',
+            'Architecture/Controller', 'routes', 'Architecture/Middleware', 'Architecture/Job', 'Architecture/Providers', 'Domain/Repository','Domain/Service', 'Domain/DTO', 'Domain/Exception', 'Persistence/Model', 'Persistence/migrations', 'Persistence/Factory', 'Persistence/Seeder', 'config',
             'Test/Unit', 'Test/Feature',
         ];
 
@@ -107,13 +107,11 @@ use Core\Providers\ModuleServiceProvider;
 
 class {$name}ServiceProvider extends ModuleServiceProvider
 {
-    public function provides(): array {
-        return [];
+    protected function modulePath(): string {
+        return base_path('modules/{$name}');
     }
 
-    protected function registerBindings(): void {
-
-    }
+    public array \$moduleBindings = [];
 }
 PHP;
         file_put_contents($path, $stub);
@@ -152,7 +150,7 @@ PHP;
 
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('api/v1/{$lower}')->name('{$lower}.')->group(function () {
+Route::prefix('api/{$lower}/v1')->name('{$lower}.')->group(function () {
     // Define {$name} module routes here
 });
 PHP;
@@ -173,9 +171,8 @@ PHP;
             "enabled" => true,
             "environment" => "local",
             "dependencies" => [],
-            "features" => [],
-            "resourceProvider" => "Modules\\{$name}\\{$name}ResourceProvider",
-            "serviceProvider" => "Modules\\{$name}\\Architecture\Providers\\{$name}ServiceProvider",
+            "featureFlags" => [],
+            "roles" => [],
         ];
 
         file_put_contents(
