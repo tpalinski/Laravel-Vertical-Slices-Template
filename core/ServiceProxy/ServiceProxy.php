@@ -6,6 +6,7 @@ namespace Core\ServiceProxy;
 
 use Core\Annotations\Feature;
 use Core\Exception\Feature\FeatureNotEnabledException;
+use Illuminate\Support\Facades\Log;
 use ReflectionMethod;
 
 class ServiceProxy {
@@ -16,7 +17,7 @@ class ServiceProxy {
     ) {}
 
     private function featureEnabled(string $flag): bool {
-        return $this->featureFlags[$flag] ?? false;
+        return array_search($flag, $this->featureFlags, true) !== false;
     }
 
     public function call($method, $arguments) {
