@@ -1,0 +1,27 @@
+FROM php:8.5.4-fpm AS base
+
+FROM base AS runtime
+
+# Fix perms for chowning files
+ARG UID=1000
+ARG GID=1000
+RUN usermod -u ${UID} www-data && groupmod -g ${GID} www-data
+# PHP extensions
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpng-dev \
+    libjpeg-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    curl \
+    unzip \
+    git \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath \
+    && pecl install redis && docker-php-ext-enable redis
+# Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+WORKDIR /var/www/html
+# Perms, fix for volume bind in prod
+COPY . .
+USER www-data

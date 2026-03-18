@@ -79,8 +79,14 @@ abstract class ModuleServiceProvider extends ServiceProvider implements Deferrab
         });
     }
 
+    protected function getModuleName(): string {
+        $frags = explode('/', trim($this->modulePath(), '/'));
+        $name = end($frags);
+        return ucfirst($name);
+    }
+
     protected function cacheKey(): string {
-        return 'modules.' . $this->modulePath();
+        return 'modules.' . $this->getModuleName();
     }
 
     /**
