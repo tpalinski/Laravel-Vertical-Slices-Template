@@ -5,6 +5,7 @@ use Core\Commands\MakeModuleCommand;
 use Core\Commands\MakeModuleMigrationCommand;
 use Core\Commands\MakeModuleModelCommand;
 use Core\Middleware\ForceJsonResponse;
+use Core\Middleware\RequestTimer;
 use Core\Providers\ModuleManagerServiceProvider;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Application;
@@ -21,7 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->append(ForceJsonResponse::class);
+        $middleware->append([
+            RequestTimer::class,
+            ForceJsonResponse::class,
+        ]);
         $middleware->remove([
             StartSession::class,
             VerifyCsrfToken::class,

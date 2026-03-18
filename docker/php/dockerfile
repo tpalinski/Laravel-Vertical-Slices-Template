@@ -24,4 +24,5 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 # Perms, fix for volume bind in prod
 COPY . .
-USER www-data
+RUN composer install
+CMD [ "php-fpm" ]

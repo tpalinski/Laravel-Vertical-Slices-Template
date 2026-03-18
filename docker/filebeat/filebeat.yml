@@ -1,0 +1,14 @@
+filebeat.inputs:
+  - type: filestream
+    id: docker-logs
+    prospector.scanner.symlinks: true
+    parsers:
+    - container:
+      stream: stdout
+      format: docker
+    paths:
+      - '/var/log/containers/*.log'
+
+
+output.logstash:
+  hosts: ["logstash:5044"]
