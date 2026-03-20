@@ -1,0 +1,9 @@
+{
+    "name": "Auth",
+    "version": "1.0.0",
+    "enabled": true,
+    "environment": "local",
+    "dependencies": [],
+    "featureFlags": [],
+    "roles": []
+}

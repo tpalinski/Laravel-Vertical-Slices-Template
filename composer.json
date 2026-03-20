@@ -12,6 +12,8 @@
         "php": "^8.4",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "league/oauth2-server": "9.3.0",
+        "nyholm/psr7": "^1.8",
         "spatie/laravel-data": "^4.20",
         "symfony/cache": "^8.0"
     },

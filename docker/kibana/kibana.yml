@@ -1,7 +1,0 @@
-server.host: "0.0.0.0"
-
-elasticsearch.hosts: ["http://elasticsearch:9200"]
-
-elasticsearch.serviceToken: "AAEAAWVsYXN0aWMva2liYW5hL2tpYmFuYS10b2tlbjpTeVJneVJ4alFQeXc1WW5ERWdrNHFn"
-elasticsearch.username: "elastic"
-elasticsearch.password: "elastic"
