@@ -12,5 +12,8 @@ return [
             "redirectUri" => "https://wave.com.pl",
             "confidential" => false,
         ],
+    ],
+    "tokens" => [
+        "ttl" => 60,
     ]
 ];
