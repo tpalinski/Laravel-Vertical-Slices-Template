@@ -5,15 +5,24 @@ return [
         "nxsfr" => [
             "name" => "nexus-frontend",
             "redirectUri" => "http://127.0.0.1",
-            "confidential" => false,
+            "confidential" => true,
         ],
         "pnl" => [
             "name" => "panel",
             "redirectUri" => "https://wave.com.pl",
-            "confidential" => false,
+            "confidential" => true,
         ],
     ],
     "tokens" => [
-        "ttl" => 60,
+        "access" => [
+            "ttl" => 60,
+        ],
+        "refresh" => [
+            "ttl" => 3600,
+        ],
+    ],
+    "encryption" => [
+        "privateKeyPath" => env('AUTH_PRIVATE_KEY_PATH', 'oauth-private.key'),
+        "key" => env('AUTH_ENCRYPTION_KEY', 'lxZFUEsBCJ2Yb14IF2ygAHI5N4+ZAUXXaSeeJm6+twsUmIen'),
     ]
 ];

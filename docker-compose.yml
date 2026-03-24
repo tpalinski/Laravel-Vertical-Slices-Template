@@ -57,5 +57,3 @@ networks:
 volumes:
   db_data:
   dragonflydata:
-  es_data:
-  es_tokens:

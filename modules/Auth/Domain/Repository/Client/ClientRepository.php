@@ -8,7 +8,7 @@ use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use Modules\Auth\Domain\Entity\Client\ClientEntity;
 
-class NexusServerClient implements ClientRepositoryInterface {
+class ClientRepository implements ClientRepositoryInterface {
 
     public function getClientEntity(string $clientIdentifier): ?ClientEntityInterface {
         return new ClientEntity($clientIdentifier);

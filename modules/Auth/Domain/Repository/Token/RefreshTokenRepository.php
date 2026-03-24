@@ -17,16 +17,21 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface {
 
     public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity): void {
         DB::table('refresh_tokens')->insert([
-            $refreshTokenEntity->getIdentifier(),
-            $refreshTokenEntity,
+            'token_id' => $refreshTokenEntity->getIdentifier(),
+            'access_token_id' => $refreshTokenEntity->getAccessToken()->getIdentifier(),
+            'expires_at' => $refreshTokenEntity->getExpiryDateTime(),
+            'revoked' => false,
         ]);
     }
 
     public function revokeRefreshToken(string $tokenId): void {
-        throw new \Exception('Not implemented');
+        DB::table('refresh_tokens')->where('token_id', '=', $tokenId)->update([
+            'revoked' => true,
+        ]);
     }
 
     public function isRefreshTokenRevoked(string $tokenId): bool {
-        throw new \Exception('Not implemented');
+        $isRevoked = DB::table('refresh_tokens')->where('token_id', '=', $tokenId)->first('revoked');
+        return $isRevoked ?? true;
     }
 }

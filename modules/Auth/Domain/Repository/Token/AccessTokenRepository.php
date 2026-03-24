@@ -24,7 +24,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface {
 
     public function revokeAccessToken(string $tokenId): void {
         $key = $this->cacheKey . $tokenId;
-        $ttl = config('auth.tokens.ttl', 60);
+        $ttl = config('auth.tokens.access.ttl', 60);
         Cache::put($key, true, $ttl);
     }
 
