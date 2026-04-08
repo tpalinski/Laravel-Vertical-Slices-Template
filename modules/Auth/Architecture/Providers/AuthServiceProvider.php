@@ -7,6 +7,8 @@ namespace Modules\Auth\Architecture\Providers;
 use Core\Providers\ModuleServiceProvider;
 use Modules\Auth\Domain\Service\OAuthService;
 use Modules\Auth\Domain\Service\AuthServiceInterface;
+use Modules\Auth\Domain\Service\UserCredentials\LocalUserCredentialsService;
+use Modules\Auth\Domain\Service\UserCredentials\UserCredentialsServiceInterface;
 
 class AuthServiceProvider extends ModuleServiceProvider
 {
@@ -16,5 +18,6 @@ class AuthServiceProvider extends ModuleServiceProvider
 
     public array $moduleBindings = [
         AuthServiceInterface::class => OAuthService::class,
+        UserCredentialsServiceInterface::class => LocalUserCredentialsService::class,
     ];
 }
