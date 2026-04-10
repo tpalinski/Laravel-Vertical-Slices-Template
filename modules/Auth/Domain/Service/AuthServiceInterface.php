@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Domain\Service;
 
-use Modules\Auth\Domain\Exception\User\InvalidPasswordException;
-use Modules\Auth\Domain\Exception\User\NonexistentUserException;
+use Modules\Auth\Domain\Exception\User\InvalidClientException;
+use Modules\Auth\Domain\Exception\User\UserNotAuthenticatedException;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,10 +27,10 @@ interface AuthServiceInterface {
      * @param ServerRequestInterface $request - PSR7 request for token issuing
      * @param Response $response - PSR7 response, most likely an empty one
      *
-     * @throws InvalidPasswordException when password does not match
-     * @throws NonexistentUserException when no user with provided login exists
+     * @throws UserNotAuthenticatedException when user is not authenticated
+     * @throws InvalidClientException when the client ids mismatch with authentication record
      *
      * @return ResponseInterface $response - response with oauth token
      */
-    public function authorize(string $login, string $password, ServerRequestInterface $request, Response $response): ResponseInterface;
+    public function authorize(string $authTicket, string $clientId, ServerRequestInterface $request, Response $response): ResponseInterface;
 }

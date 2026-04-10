@@ -8,14 +8,16 @@ enum Environment: string {
     case PRODUCTION = "production";
     case STAGING = "staging";
     case DEVELOPMENT = "development";
+    case TESTING = "testing";
     case LOCAL = "local";
 
     public function asInt() : int {
         return match ($this) {
-            Environment::LOCAL => 0,
-            Environment::DEVELOPMENT => 1,
-            Environment::STAGING => 2,
-            Environment::PRODUCTION => 3,
+            Environment::TESTING => 0,
+            Environment::LOCAL => 1,
+            Environment::DEVELOPMENT => 2,
+            Environment::STAGING => 3,
+            Environment::PRODUCTION => 4,
         };
     }
 }
