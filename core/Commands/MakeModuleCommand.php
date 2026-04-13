@@ -30,7 +30,7 @@ class MakeModuleCommand extends Command
         $base   = base_path("modules/{$name}");
 
         $directories = [
-            'Architecture/Controller', 'routes', 'Architecture/Middleware', 'Architecture/Job', 'Architecture/Providers', 'Domain/Repository','Domain/Service', 'Domain/DTO', 'Domain/Exception', 'Persistence/Model', 'Persistence/migrations', 'Persistence/Factory', 'Persistence/Seeder', 'config',
+            'Architecture/Controller', 'routes', 'Architecture/Middleware', 'Architecture/Job', 'Architecture/Providers', 'Architecture/Request', 'Architecture/Response', 'Domain/Repository','Domain/Service', 'Domain/DTO', 'Domain/Exception', 'Persistence/Model', 'Persistence/migrations', 'Persistence/Factory', 'Persistence/Seeder', 'config',
             'Test/Unit', 'Test/Feature',
         ];
 

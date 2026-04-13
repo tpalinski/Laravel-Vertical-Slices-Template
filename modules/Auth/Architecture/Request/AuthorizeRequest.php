@@ -15,8 +15,7 @@ class AuthorizeRequest extends FormRequest {
 
     public function rules(): array {
         return [
-            'login' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'authTicket' => ['required', 'string'],
             'response_type' => [
                 'required',
                 'string',

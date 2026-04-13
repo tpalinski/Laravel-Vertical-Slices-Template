@@ -15,10 +15,10 @@ class ClientEntity implements ClientEntityInterface {
 
     public function __construct(string $clientIdentifier) {
         $this->identifier = $clientIdentifier;
-        $config = config("auth.clients.{$clientIdentifier}");
-        $this->clientName = $config['name'];
-        $this->isConfidential = $config['confidential'];
-        $this->redirectUri = $config['redirectUri'];
+        $config = config("auth.clients.{$clientIdentifier}", "");
+        $this->clientName = $config['name'] ?? "";
+        $this->isConfidential = $config['confidential'] ?? true;
+        $this->redirectUri = $config['redirectUri'] ?? "";
     }
 
     public function getName(): string {

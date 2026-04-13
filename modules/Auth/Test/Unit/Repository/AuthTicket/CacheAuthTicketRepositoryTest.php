@@ -37,10 +37,11 @@ class CacheAuthTicketRepositoryTest extends TestCase
             created: new DateTimeImmutable()
         );
 
-        $key = $repo->createAuthTicket($dto);
+        $ticket = $repo->createAuthTicket($dto);
 
         // 1. key structure is correct
-        $this->assertStringStartsWith('auth.tickets.', $key);
+        $this->assertNotEmpty($ticket);
+        $key = 'auth.tickets.' . $ticket;
 
         // 2. value is actually stored in cache
         $stored = Cache::get($key);

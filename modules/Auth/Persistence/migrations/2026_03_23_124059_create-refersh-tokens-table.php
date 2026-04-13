@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('refresh_tokens', function (Blueprint $table) {
             $table->string('token_id')->primary();
             $table->string('access_token_id');
-            $table->dateTime('exipres_at');
+            $table->dateTime('expires_at');
             $table->boolean('revoked')->default(false);
         });
     }

@@ -33,6 +33,6 @@ class CacheAuthTicketRepository implements AuthTicketRepositoryInterface {
         $key = $this->getCacheKey($hashed);
         $content = $ticket->toArray();
         Cache::put($key, $content, 60*5);
-        return $key;
+        return $hashed;
     }
 }

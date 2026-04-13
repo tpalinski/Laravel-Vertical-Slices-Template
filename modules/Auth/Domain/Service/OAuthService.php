@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Modules\Auth\Domain\Service;
 
 use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use Modules\Auth\Domain\Entity\User\UserEntity;
+use Modules\Auth\Domain\Exception\Oauth\RequestValidationException;
 use Modules\Auth\Domain\Factory\OAuthServerFactory;
 use Modules\Auth\Domain\Service\UserCredentials\UserCredentialsServiceInterface;
 use Nyholm\Psr7\Response;
@@ -27,7 +29,11 @@ class OAuthService implements AuthServiceInterface {
     }
 
     public function authorize(string $authTicket, string $clientId, ServerRequestInterface $request, Response $response): ResponseInterface {
-        $authRequest = $this->authServer->validateAuthorizationRequest($request);
+        try {
+            $authRequest = $this->authServer->validateAuthorizationRequest($request);
+        } catch (OAuthServerException $e) {
+            throw new RequestValidationException($e->getMessage());
+        }
         $userId = $this->userCredentialsService->isUserAuthenticated($authTicket, $clientId);
         $authRequest->setUser(new UserEntity($userId));
         $authRequest->setAuthorizationApproved(True);
