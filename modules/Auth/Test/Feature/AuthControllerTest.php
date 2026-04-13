@@ -7,6 +7,8 @@ namespace Modules\Auth\Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
+use Modules\Auth\Architecture\Middleware\ValidateAuthScopes;
 use Modules\Auth\Persistence\Model\UserCredentials;
 use Modules\Auth\Domain\Repository\User\UserCredentialsRepository;
 
@@ -27,6 +29,16 @@ class AuthControllerTest extends TestCase
         $user->password = Hash::make('secret');
 
         $repo->addUser($user);
+
+       Route::middleware([ValidateAuthScopes::class . ':module:read'])
+        ->get('/test/protected', function (\Illuminate\Http\Request $request) {
+            return response()->json([
+                'ok' => true,
+                'user_id' => $request->attributes->get('oauth_user_id'),
+                'client_id' => $request->attributes->get('oauth_client_id'),
+                'scopes' => $request->attributes->get('oauth_scopes'),
+            ]);
+        });
     }
 
     public function test_full_authorization_code_flow_until_authorize(): void
@@ -201,5 +213,125 @@ class AuthControllerTest extends TestCase
         ]);
 
         $this->assertTrue(in_array($response->getStatusCode(), [400, 401]));
+    }
+
+    public function test_protected_route_with_valid_scope(): void
+    {
+        /* =========================================================
+         * STEP 1: LOGIN
+         * ========================================================= */
+        $loginResponse = $this->postJson('/auth/login', [
+            'login' => 'john',
+            'password' => 'secret',
+            'clientId' => 'nxsfr',
+        ]);
+
+        $ticket = $loginResponse->json('authTicket');
+
+        /* =========================================================
+         * STEP 2: AUTHORIZE (scope: module:read)
+         * ========================================================= */
+        $authorizeResponse = $this->get('/auth/authorize?' . http_build_query([
+            'response_type' => 'code',
+            'client_id' => 'nxsfr',
+            'redirect_uri' => 'http://127.0.0.1',
+            'scope' => 'module:read',
+            'state' => 'xyz',
+            'authTicket' => $ticket,
+        ]));
+
+        $location = $authorizeResponse->headers->get('Location');
+        parse_str(parse_url($location, PHP_URL_QUERY), $queryParams);
+
+        $authCode = $queryParams['code'];
+
+        /* =========================================================
+         * STEP 3: TOKEN
+         * ========================================================= */
+        $tokenResponse = $this->post('/auth/token', [
+            'grant_type' => 'authorization_code',
+            'client_id' => 'nxsfr',
+            'client_secret' => 'secret',
+            'redirect_uri' => 'http://127.0.0.1',
+            'code' => $authCode,
+        ]);
+
+        $data = json_decode($tokenResponse->getContent(), true);
+        $accessToken = $data['access_token'];
+
+        /* =========================================================
+         * STEP 4: CALL PROTECTED ROUTE (middleware tested here)
+         * ========================================================= */
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->getJson('/test/protected');
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'ok' => true,
+        ]);
+
+        // ✅ Ensure middleware injected attributes
+        $this->assertEquals('user-123', $response->json('user_id'));
+        $this->assertEquals('nxsfr', $response->json('client_id'));
+        $this->assertContains('module:read', $response->json('scopes'));
+    }
+
+    public function test_protected_route_with_invalid_scope_returns_403(): void
+    {
+        // Same flow, but request DIFFERENT scope
+        $loginResponse = $this->postJson('/auth/login', [
+            'login' => 'john',
+            'password' => 'secret',
+            'clientId' => 'nxsfr',
+        ]);
+
+        $ticket = $loginResponse->json('authTicket');
+
+        $authorizeResponse = $this->get('/auth/authorize?' . http_build_query([
+            'response_type' => 'code',
+            'client_id' => 'nxsfr',
+            'redirect_uri' => 'http://127.0.0.1',
+            'scope' => 'module:write', // ❌ different scope
+            'state' => 'xyz',
+            'authTicket' => $ticket,
+        ]));
+
+        $location = $authorizeResponse->headers->get('Location');
+        parse_str(parse_url($location, PHP_URL_QUERY), $queryParams);
+
+        $authCode = $queryParams['code'];
+
+        $tokenResponse = $this->post('/auth/token', [
+            'grant_type' => 'authorization_code',
+            'client_id' => 'nxsfr',
+            'client_secret' => 'secret',
+            'redirect_uri' => 'http://127.0.0.1',
+            'code' => $authCode,
+        ]);
+
+        $accessToken = json_decode($tokenResponse->getContent(), true)['access_token'];
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->getJson('/test/protected');
+
+        $response->assertStatus(403);
+    }
+
+    public function test_protected_route_without_token_returns_401(): void
+    {
+        $response = $this->getJson('/test/protected');
+
+        $response->assertStatus(401);
+    }
+
+    public function test_protected_route_with_invalid_token_returns_403(): void
+    {
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer invalid-token',
+        ])->getJson('/test/protected');
+
+        $response->assertStatus(403);
     }
 }

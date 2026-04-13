@@ -23,6 +23,7 @@ return [
     ],
     "encryption" => [
         "privateKeyPath" => env('AUTH_PRIVATE_KEY_PATH', 'oauth-private.key'),
+        "publicKeyPath" => env('AUTH_PUBLIC_KEY_PATH', 'oauth-public.key'),
         "key" => env('AUTH_ENCRYPTION_KEY', 'lxZFUEsBCJ2Yb14IF2ygAHI5N4+ZAUXXaSeeJm6+twsUmIen'),
     ]
 ];
