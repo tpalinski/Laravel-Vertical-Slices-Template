@@ -47,6 +47,7 @@ class MakeModuleCommand extends Command
         $this->generateConfig($base, $lower);
         $this->generateApiRoutes($base, $name, $lower);
         $this->generateManifest($base, $name);
+        $this->generateReadme($base, $name);
 
         $this->newLine();
         $this->info("Module [{$name}] scaffolded successfully.");
@@ -184,5 +185,14 @@ PHP;
         );
 
         $this->info("Manifest generated: {$manifestPath}");
+    }
+
+    private function generateReadme(string $base, string $name) {
+        $readmePath = rtrim($base, '/').'/readme.md';
+        if (file_exists($readmePath)) {
+            return;
+        }
+        file_put_contents($readmePath, '# ' . $name);
+        $this->info("Readme generated: {$readmePath}");
     }
 }
