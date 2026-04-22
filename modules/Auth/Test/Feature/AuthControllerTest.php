@@ -334,4 +334,209 @@ class AuthControllerTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_refresh_token_flow_returns_new_access_token(): void
+    {
+        /* =========================================================
+         * STEP 1: LOGIN
+         * ========================================================= */
+        $loginResponse = $this->postJson('/auth/login', [
+            'login' => 'john',
+            'password' => 'secret',
+            'clientId' => 'nxsfr',
+        ]);
+
+        $ticket = $loginResponse->json('authTicket');
+
+        /* =========================================================
+         * STEP 2: AUTHORIZE
+         * ========================================================= */
+        $authorizeResponse = $this->get('/auth/authorize?' . http_build_query([
+            'response_type' => 'code',
+            'client_id' => 'nxsfr',
+            'redirect_uri' => 'http://127.0.0.1',
+            'scope' => 'module:read',
+            'state' => 'xyz',
+            'authTicket' => $ticket,
+        ]));
+
+        $location = $authorizeResponse->headers->get('Location');
+        parse_str(parse_url($location, PHP_URL_QUERY), $queryParams);
+
+        $authCode = $queryParams['code'];
+
+        /* =========================================================
+         * STEP 3: TOKEN (initial)
+         * ========================================================= */
+        $tokenResponse = $this->post('/auth/token', [
+            'grant_type' => 'authorization_code',
+            'client_id' => 'nxsfr',
+            'client_secret' => 'secret',
+            'redirect_uri' => 'http://127.0.0.1',
+            'code' => $authCode,
+        ]);
+
+        $tokenResponse->assertStatus(200);
+
+        $data = json_decode($tokenResponse->getContent(), true);
+
+        $accessToken1 = $data['access_token'];
+        $refreshToken = $data['refresh_token'];
+
+        $this->assertNotEmpty($refreshToken);
+
+
+        /* =========================================================
+         * STEP 4: REFRESH TOKEN
+         * ========================================================= */
+        $refreshResponse = $this->post('/auth/token', [
+            'grant_type' => 'refresh_token',
+            'client_id' => 'nxsfr',
+            'client_secret' => 'secret',
+            'refresh_token' => $refreshToken,
+            // optional:
+            // 'scope' => 'module:read',
+        ]);
+
+        $refreshResponse->assertStatus(200);
+
+        $refreshData = json_decode($refreshResponse->getContent(), true);
+
+        /* =========================================================
+         * ASSERTIONS
+         * ========================================================= */
+
+        // structure
+        $this->assertArrayHasKey('access_token', $refreshData);
+        $this->assertArrayHasKey('refresh_token', $refreshData);
+        $this->assertArrayHasKey('expires_in', $refreshData);
+        $this->assertEquals('Bearer', $refreshData['token_type']);
+
+        // new tokens should be different
+        $this->assertNotEquals($accessToken1, $refreshData['access_token']);
+
+        // depending on implementation (rotation or reuse)
+        $this->assertNotEmpty($refreshData['refresh_token']);
+
+        /* =========================================================
+         * STEP 5: USE NEW ACCESS TOKEN
+         * ========================================================= */
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $refreshData['access_token'],
+        ])->getJson('/test/protected');
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'ok' => true,
+        ]);
+    }
+
+    public function test_refresh_token_with_invalid_token_fails(): void
+    {
+        $response = $this->post('/auth/token', [
+            'grant_type' => 'refresh_token',
+            'client_id' => 'nxsfr',
+            'client_secret' => 'secret',
+            'refresh_token' => 'invalid-token',
+        ]);
+
+        $response->assertStatus(400);
+    }
+
+    public function test_refresh_token_is_one_time_use_and_rotates_correctly(): void
+    {
+        /* =========================================================
+         * STEP 1: LOGIN
+         * ========================================================= */
+        $loginResponse = $this->postJson('/auth/login', [
+            'login' => 'john',
+            'password' => 'secret',
+            'clientId' => 'nxsfr',
+        ]);
+
+        $ticket = $loginResponse->json('authTicket');
+
+        /* =========================================================
+         * STEP 2: AUTHORIZE
+         * ========================================================= */
+        $authorizeResponse = $this->get('/auth/authorize?' . http_build_query([
+            'response_type' => 'code',
+            'client_id' => 'nxsfr',
+            'redirect_uri' => 'http://127.0.0.1',
+            'scope' => 'module:read',
+            'state' => 'xyz',
+            'authTicket' => $ticket,
+        ]));
+
+        $location = $authorizeResponse->headers->get('Location');
+        parse_str(parse_url($location, PHP_URL_QUERY), $queryParams);
+
+        $authCode = $queryParams['code'];
+
+        /* =========================================================
+         * STEP 3: INITIAL TOKEN
+         * ========================================================= */
+        $tokenResponse = $this->post('/auth/token', [
+            'grant_type' => 'authorization_code',
+            'client_id' => 'nxsfr',
+            'client_secret' => 'secret',
+            'redirect_uri' => 'http://127.0.0.1',
+            'code' => $authCode,
+        ]);
+
+        $tokenResponse->assertStatus(200);
+
+        $data = json_decode($tokenResponse->getContent(), true);
+
+        $refreshToken1 = $data['refresh_token'];
+
+        /* =========================================================
+         * STEP 4: FIRST REFRESH (valid)
+         * ========================================================= */
+        $refreshResponse1 = $this->post('/auth/token', [
+            'grant_type' => 'refresh_token',
+            'client_id' => 'nxsfr',
+            'client_secret' => 'secret',
+            'refresh_token' => $refreshToken1,
+        ]);
+
+        $refreshResponse1->assertStatus(200);
+
+        $data1 = json_decode($refreshResponse1->getContent(), true);
+
+        $accessToken2 = $data1['access_token'];
+        $refreshToken2 = $data1['refresh_token'];
+
+        $this->assertNotEquals($refreshToken1, $refreshToken2);
+
+        /* =========================================================
+         * STEP 5: REUSE OLD REFRESH TOKEN (must fail)
+         * ========================================================= */
+        $refreshResponse2 = $this->post('/auth/token', [
+            'grant_type' => 'refresh_token',
+            'client_id' => 'nxsfr',
+            'client_secret' => 'secret',
+            'refresh_token' => $refreshToken1,
+        ]);
+
+        $refreshResponse2->assertStatus(400);
+
+        /* =========================================================
+         * STEP 6: USE NEW REFRESH TOKEN (must succeed)
+         * ========================================================= */
+        $refreshResponse3 = $this->post('/auth/token', [
+            'grant_type' => 'refresh_token',
+            'client_id' => 'nxsfr',
+            'client_secret' => 'secret',
+            'refresh_token' => $refreshToken2,
+        ]);
+
+        $refreshResponse3->assertStatus(200);
+
+        $data3 = json_decode($refreshResponse3->getContent(), true);
+
+        $this->assertArrayHasKey('access_token', $data3);
+        $this->assertArrayHasKey('refresh_token', $data3);
+        $this->assertNotEquals($refreshToken2, $data3['refresh_token']);
+    }
 }

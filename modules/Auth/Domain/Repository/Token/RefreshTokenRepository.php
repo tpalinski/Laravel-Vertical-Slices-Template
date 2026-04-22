@@ -31,7 +31,10 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface {
     }
 
     public function isRefreshTokenRevoked(string $tokenId): bool {
-        $isRevoked = DB::table('refresh_tokens')->where('token_id', '=', $tokenId)->first('revoked');
-        return $isRevoked ?? true;
+        $token = DB::table('refresh_tokens')->where('token_id', '=', $tokenId)->first();
+        if ($token === null || $token->revoked) {
+            return true;
+        }
+        return false;
     }
 }

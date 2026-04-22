@@ -1,0 +1,197 @@
+openapi: 3.0.3
+info:
+  title: Auth Module
+  version: 1.0.0
+  description: Authentication endpoints - oauth and login
+
+servers:
+  - url: /auth
+
+paths:
+  /token:
+    post:
+      summary: Issue OAuth token
+      operationId: postToken
+      tags:
+        - Auth
+      requestBody:
+        description: Authorization code request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auth_TokenRequest'
+      responses:
+        '200':
+          description: Token issued successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auth_TokenResponse'
+        '400':
+          description: Bad request (OAuth error)
+        '401':
+          description: Unauthorized
+
+  /authorize:
+    get:
+      summary: Authorize client
+      operationId: getAuthorize
+      tags:
+        - Auth
+      parameters:
+        - name: response_type
+          in: query
+          required: true
+          description: Must be set to "code" for Authorization Code flow
+          schema:
+            type: string
+            enum:
+              - code
+
+        - name: client_id
+          in: query
+          required: true
+          description: ID of the client from which the user authenticates
+          schema:
+            type: string
+
+        - name: redirect_uri
+          in: query
+          required: false
+          description: Client redirect URI. If omitted, a pre-registered redirect URI will be used.
+          schema:
+            type: string
+            format: uri
+
+        - name: scope
+          in: query
+          required: false
+          description: Space-delimited list of requested scopes
+          schema:
+            type: string
+            example: "module:read module:write"
+
+        - name: state
+          in: query
+          required: false
+          description: CSRF token used to prevent cross-site request forgery attacks.
+          schema:
+            type: string
+
+        - name: authTicket
+          in: query
+          required: false
+          description: Auth ticket received from authentication endpoints
+          schema:
+            type: string
+
+      responses:
+        '302':
+          description: Authorization successful
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized (invalid client, not authenticated, validation error)
+
+  /login:
+    post:
+      summary: Login user and get auth ticket
+      operationId: postLogin
+      tags:
+        - Auth
+      requestBody:
+        description: TODO - define login request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auth_LoginRequest'
+      responses:
+        '201':
+          description: Auth ticket returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auth_AuthTicketResponse'
+        '401':
+          description: Invalid password
+        '404':
+          description: User not found
+
+components:
+  schemas:
+    Auth_AuthTicketResponse:
+      type: object
+      description: Authentication ticket response
+      properties:
+        authTicket:
+          type: string
+          example: "abc123"
+      required:
+        - authTicket
+
+    Auth_TokenRequest:
+      type: object
+      required:
+        - grant_type
+        - client_id
+        - client_secret
+        - code
+      properties:
+        grant_type:
+          type: string
+          description: Must be set to "authorization_code", "client" or "refresh_token"
+          enum:
+            - authorization_code
+        client_id:
+          type: string
+          description: Client identifier issued during registration
+        client_secret:
+          type: string
+          description: Client secret issued during registration
+        redirect_uri:
+          type: string
+          format: uri
+          description: Must match the redirect_uri used in the authorization request. Omit if not used previously.
+        code:
+          type: string
+          description: Authorization code received from the authorization endpoint
+
+    Auth_TokenResponse:
+      type: object
+      required:
+        - token_type
+        - expires_in
+        - access_token
+        - refresh_token
+      properties:
+        token_type:
+          type: string
+          description: Token type
+          enum:
+            - Bearer
+        expires_in:
+          type: integer
+          format: int32
+          description: Time to live of the access token in seconds
+          example: 3600
+        access_token:
+          type: string
+          description: JWT signed with the authorization server’s private key
+        refresh_token:
+          type: string
+          description: Encrypted payload used to refresh the access token
+
+    Auth_LoginRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          description: User login
+        password:
+          type: string
+          description: User password
